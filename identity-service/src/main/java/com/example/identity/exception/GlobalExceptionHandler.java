@@ -2,6 +2,7 @@ package com.example.identity.exception;
 
 import com.example.identity.config.serialize.ApiResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,7 +19,13 @@ public class GlobalExceptionHandler {
         return ApiResponse.error(ex.getCode(), ex.getMessage());
     }
 
-    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseBody
+    ApiResponse<?> handlingAccessDeniedException(AccessDeniedException ex) {
+        return ApiResponse.error(403, ex.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
     public ApiResponse<?> handlingValidation(MethodArgumentNotValidException exception) {
         String message = Objects.requireNonNull(exception.getFieldError()).getDefaultMessage();
