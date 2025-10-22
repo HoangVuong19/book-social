@@ -1,6 +1,6 @@
 package com.example.identity.dto.request;
 
-public record AuthenticationRequest(
+public record LoginRequest(
         String username,
         String password
 ) {

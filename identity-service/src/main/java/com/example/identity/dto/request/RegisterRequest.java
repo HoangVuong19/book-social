@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
-public record UserCreationRequest(
+public record RegisterRequest(
         @Size(min = 3, message = "Username must be at least 3 characters")
         String username,
 

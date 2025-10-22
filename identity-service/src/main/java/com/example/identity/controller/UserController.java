@@ -1,14 +1,14 @@
 package com.example.identity.controller;
 
-import com.example.identity.config.serialize.ApiResponse;
-import com.example.identity.dto.request.UserCreationRequest;
 import com.example.identity.dto.request.UserUpdateRequest;
+import com.example.identity.dto.response.UserResponse;
 import com.example.identity.entity.User;
 import com.example.identity.service.UserService;
-import jakarta.validation.Valid;
+import com.example.identity.utils.UserContext;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,21 +20,17 @@ import java.util.List;
 public class UserController {
 
     UserService userService;
+    UserContext userContext;
 
-    @PostMapping
-    ApiResponse<User> createUser(@RequestBody @Valid UserCreationRequest request) {
-        User user = userService.createUser(request);
-        return ApiResponse.success(user);
+    @GetMapping("/me")
+    UserResponse getMe() {
+        String username = userContext.getCurrentUsername();
+        return userService.getUserByUsername(username);
     }
 
     @GetMapping
     List<User> getUsers() {
         return userService.getUsers();
-    }
-
-    @GetMapping("/{userId}")
-    User getUser(@PathVariable("userId") String userId) {
-        return userService.getUser(userId);
     }
 
     @PutMapping("/{userId}")
@@ -43,6 +39,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
     String deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
         return "User has been deleted";
