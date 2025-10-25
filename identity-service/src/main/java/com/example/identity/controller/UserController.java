@@ -1,5 +1,6 @@
 package com.example.identity.controller;
 
+import com.example.identity.config.serialize.ApiResponse;
 import com.example.identity.dto.request.UserUpdateRequest;
 import com.example.identity.dto.response.UserResponse;
 import com.example.identity.entity.User;
@@ -23,26 +24,26 @@ public class UserController {
     UserContext userContext;
 
     @GetMapping("/me")
-    UserResponse getMe() {
+    ApiResponse<UserResponse> getMe() {
         String username = userContext.getCurrentUsername();
-        return userService.getUserByUsername(username);
+        return ApiResponse.success(userService.getUserByUsername(username));
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    List<User> getUsers() {
-        return userService.getUsers();
+    ApiResponse<List<User>> getUsers() {
+        return ApiResponse.success(userService.getUsers());
     }
 
     @PutMapping("/{userId}")
-    User updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
-        return userService.updateUser(userId, request);
+    ApiResponse<UserResponse> updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
+        return ApiResponse.success(userService.updateUser(userId, request));
     }
 
     @DeleteMapping("/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
-    String deleteUser(@PathVariable String userId) {
+    ApiResponse<String> deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
-        return "User has been deleted";
+        return ApiResponse.success("User has been deleted");
     }
 }

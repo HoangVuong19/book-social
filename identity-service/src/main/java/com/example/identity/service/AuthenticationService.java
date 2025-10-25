@@ -1,13 +1,15 @@
 package com.example.identity.service;
 
+import com.example.identity.constant.PredefinedRole;
 import com.example.identity.dto.request.LoginRequest;
 import com.example.identity.dto.request.RegisterRequest;
 import com.example.identity.dto.response.UserResponse;
+import com.example.identity.entity.Role;
 import com.example.identity.entity.User;
-import com.example.identity.enums.Role;
 import com.example.identity.exception.NotFoundException;
 import com.example.identity.exception.UnauthorizedException;
 import com.example.identity.mapper.UserMapper;
+import com.example.identity.repository.RoleRepository;
 import com.example.identity.repository.UserRepository;
 import com.example.identity.utils.JwtUtils;
 import lombok.AccessLevel;
@@ -25,6 +27,7 @@ import java.util.HashSet;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationService {
     UserRepository userRepository;
+    RoleRepository roleRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
     JwtUtils jwtUtils;
@@ -47,8 +50,8 @@ public class AuthenticationService {
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.password()));
 
-        HashSet<String> roles = new HashSet<>();
-        roles.add(Role.USER.name());
+        HashSet<Role> roles = new HashSet<>();
+        roleRepository.findById(PredefinedRole.USER_ROLE).ifPresent(roles::add);
 
         user.setRoles(roles);
 

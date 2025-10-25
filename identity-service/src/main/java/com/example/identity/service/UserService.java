@@ -5,29 +5,45 @@ import com.example.identity.dto.response.UserResponse;
 import com.example.identity.entity.User;
 import com.example.identity.exception.NotFoundException;
 import com.example.identity.mapper.UserMapper;
+import com.example.identity.repository.RoleRepository;
 import com.example.identity.repository.UserRepository;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final UserMapper userMapper;
+    UserRepository userRepository;
+    RoleRepository roleRepository;
+    UserMapper userMapper;
+    PasswordEncoder passwordEncoder;
 
     public List<User> getUsers() {
         return userRepository.findAll();
     }
 
-    public User updateUser(String userId, UserUpdateRequest request) {
-        User user = getUser(userId);
+    public UserResponse updateUser(String userId, UserUpdateRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not existed"));
 
         userMapper.updateUser(user, request);
-        return userRepository.save(user);
+        user.setPassword(passwordEncoder.encode(request.password()));
+
+        var roles = roleRepository.findAllById(request.roles());
+        user.setRoles(new HashSet<>(roles));
+
+        return userMapper.toUserResponse(userRepository.save(user));
     }
 
     public void deleteUser(String userId) {
