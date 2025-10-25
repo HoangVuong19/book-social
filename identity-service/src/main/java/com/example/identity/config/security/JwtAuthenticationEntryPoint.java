@@ -14,6 +14,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException {
 
+        response.setStatus(HttpServletResponse.SC_OK);
         ApiResponse<?> apiResponse = ApiResponse.error(401, "Unauthenticated");
         ObjectMapper objectMapper = new ObjectMapper();
         response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
