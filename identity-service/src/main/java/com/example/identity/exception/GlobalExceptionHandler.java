@@ -1,6 +1,7 @@
 package com.example.identity.exception;
 
-import com.example.identity.config.serialize.ApiResponse;
+import java.util.Objects;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -8,7 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Objects;
+import com.example.identity.config.serialize.ApiResponse;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {

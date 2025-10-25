@@ -1,9 +1,10 @@
 package com.example.identity.utils;
 
-import com.example.identity.exception.UnauthorizedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
+import com.example.identity.exception.UnauthorizedException;
 
 @Component
 public class UserContext {

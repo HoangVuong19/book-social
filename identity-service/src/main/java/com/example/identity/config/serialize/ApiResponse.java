@@ -14,11 +14,7 @@ public class ApiResponse<T> {
     ErrorResponse errors;
 
     public static <T> ApiResponse<T> success(T data) {
-        return ApiResponse.<T>builder()
-                .success(true)
-                .data(data)
-                .errors(null)
-                .build();
+        return ApiResponse.<T>builder().success(true).data(data).errors(null).build();
     }
 
     public static ApiResponse<?> error(int code, String message) {

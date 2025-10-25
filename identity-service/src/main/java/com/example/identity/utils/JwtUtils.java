@@ -1,5 +1,17 @@
 package com.example.identity.utils;
 
+import java.text.ParseException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.StringJoiner;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
 import com.example.identity.entity.User;
 import com.example.identity.exception.AppException;
 import com.example.identity.exception.UnauthorizedException;
@@ -9,20 +21,10 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-
-import java.text.ParseException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.StringJoiner;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -42,9 +44,7 @@ public class JwtUtils {
                 .subject(user.getUsername())
                 .issuer("book-social.com")
                 .issueTime(new Date())
-                .expirationTime(new Date(
-                        Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
-                ))
+                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))
                 .build();
@@ -58,11 +58,7 @@ public class JwtUtils {
             return jwsObject.serialize();
         } catch (JOSEException e) {
             log.error("Cannot create token", e);
-            throw new AppException(
-                    102,
-                    "Failed to create JWT token",
-                    HttpStatus.INTERNAL_SERVER_ERROR
-            );
+            throw new AppException(102, "Failed to create JWT token", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -73,8 +69,7 @@ public class JwtUtils {
             user.getRoles().forEach(role -> {
                 stringJoiner.add("ROLE_" + role.getName());
                 if (!CollectionUtils.isEmpty(role.getPermissions()))
-                    role.getPermissions()
-                            .forEach(permission -> stringJoiner.add(permission.getName()));
+                    role.getPermissions().forEach(permission -> stringJoiner.add(permission.getName()));
             });
 
         return stringJoiner.toString();
@@ -89,11 +84,9 @@ public class JwtUtils {
 
         var verified = signedJWT.verify(verifier);
 
-        if (!(verified && expiryTime.after(new Date())))
-            throw new UnauthorizedException("Unauthenticated");
+        if (!(verified && expiryTime.after(new Date()))) throw new UnauthorizedException("Unauthenticated");
 
-        if (invalidatedTokenRepository
-                .existsById(signedJWT.getJWTClaimsSet().getJWTID()))
+        if (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
             throw new UnauthorizedException("Unauthenticated");
 
         return signedJWT;

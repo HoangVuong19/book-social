@@ -1,5 +1,12 @@
 package com.example.identity.service;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.example.identity.dto.request.UserUpdateRequest;
 import com.example.identity.dto.response.UserResponse;
 import com.example.identity.entity.User;
@@ -7,16 +14,11 @@ import com.example.identity.exception.NotFoundException;
 import com.example.identity.mapper.UserMapper;
 import com.example.identity.repository.RoleRepository;
 import com.example.identity.repository.UserRepository;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +36,7 @@ public class UserService {
     }
 
     public UserResponse updateUser(String userId, UserUpdateRequest request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not existed"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not existed"));
 
         userMapper.updateUser(user, request);
         user.setPassword(passwordEncoder.encode(request.password()));
@@ -59,7 +60,6 @@ public class UserService {
     }
 
     public User getUser(String id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+        return userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
     }
 }
