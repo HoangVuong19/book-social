@@ -1,5 +1,6 @@
 package com.example.identity.dto.request;
 
+import com.example.identity.validator.DobConstraint;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
@@ -12,6 +13,8 @@ public record RegisterRequest(
         String password,
         String firstName,
         String lastName,
+
+        @DobConstraint(min = 18)
         LocalDate dob
 ) {
 }
