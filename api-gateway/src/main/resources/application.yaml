@@ -4,6 +4,12 @@ server:
 app:
   api-prefix: /api
 
+gateway:
+  public-paths:
+    - /api/identity/auth/login
+    - /api/identity/auth/register
+    - /api/identity/auth/introspect
+
 spring:
   application:
     name: api-gateway

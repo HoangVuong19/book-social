@@ -1,7 +1,15 @@
 package com.example.gateway.config;
 
-import java.util.List;
-
+import com.example.gateway.config.serialize.ApiResponse;
+import com.example.gateway.dto.request.IntrospectRequest;
+import com.example.gateway.dto.response.IntrospectResponse;
+import com.example.gateway.service.IdentityService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -12,19 +20,9 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ServerWebExchange;
-
-import com.example.gateway.config.serialize.ApiResponse;
-import com.example.gateway.dto.request.IntrospectRequest;
-import com.example.gateway.dto.response.IntrospectResponse;
-import com.example.gateway.service.IdentityService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @Component
 @Slf4j
@@ -33,16 +31,14 @@ import reactor.core.publisher.Mono;
 public class AuthenticationFilter implements GlobalFilter, Ordered {
     IdentityService identityService;
     ObjectMapper objectMapper;
+    CustomGatewayProperties customGatewayProperties;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         log.info("Enter authentication filter....");
 
         String path = exchange.getRequest().getURI().getPath();
-        if (isPublicEndpoint(path)) {
-            log.info("Token");
-            return chain.filter(exchange);
-        }
+        if (isPublicEndpoint(path)) return chain.filter(exchange);
 
         // Get token from authorization header
         List<String> authHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION);
@@ -84,8 +80,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     }
 
     private boolean isPublicEndpoint(String path) {
-        return path.startsWith("/api/identity/auth/login")
-                || path.startsWith("/api/identity/auth/register")
-                || path.startsWith("/api/identity/auth/introspect");
+        return customGatewayProperties.getPublicPaths().stream()
+                .anyMatch(path::contains);
     }
 }
