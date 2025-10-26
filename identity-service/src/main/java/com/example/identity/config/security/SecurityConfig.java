@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final String[] PUBLIC_ENDPOINTS = {"/auth/login", "/auth/register", "/auth/logout"};
+    private final String[] PUBLIC_ENDPOINTS = {"/auth/login", "/auth/register", "/auth/logout", "/auth/introspect"};
 
     @Value("${jwt.signerKey}")
     private String signerKey;

@@ -1,18 +1,18 @@
 package com.example.profile.service;
 
-import org.springframework.stereotype.Service;
-
 import com.example.profile.dto.request.ProfileCreationRequest;
 import com.example.profile.dto.response.UserProfileResponse;
 import com.example.profile.entity.UserProfile;
 import com.example.profile.exception.NotFoundException;
 import com.example.profile.mapper.UserProfileMapper;
 import com.example.profile.repository.UserProfileRepository;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -34,5 +34,11 @@ public class UserProfileService {
                 userProfileRepository.findById(id).orElseThrow(() -> new NotFoundException("Profile not found"));
 
         return userProfileMapper.toUserProfileResponse(userProfile);
+    }
+
+    public List<UserProfileResponse> getAllProfiles() {
+        var profiles = userProfileRepository.findAll();
+
+        return profiles.stream().map(userProfileMapper::toUserProfileResponse).toList();
     }
 }

@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.identity.config.serialize.ApiResponse;
+import com.example.identity.dto.request.IntrospectRequest;
 import com.example.identity.dto.request.LoginRequest;
 import com.example.identity.dto.request.LogoutRequest;
 import com.example.identity.dto.request.RegisterRequest;
+import com.example.identity.dto.response.IntrospectResponse;
 import com.example.identity.dto.response.UserResponse;
 import com.example.identity.service.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
@@ -44,5 +46,12 @@ public class AuthenticationController {
     ApiResponse<String> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
         authenticationService.logout(request);
         return ApiResponse.success("Logout successfully");
+    }
+
+    @PostMapping("/introspect")
+    ApiResponse<IntrospectResponse> authenticate(@RequestBody IntrospectRequest request)
+            throws ParseException, JOSEException {
+        IntrospectResponse result = authenticationService.introspect(request);
+        return ApiResponse.success(result);
     }
 }

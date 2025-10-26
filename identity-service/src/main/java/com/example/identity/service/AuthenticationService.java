@@ -8,10 +8,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.identity.constant.PredefinedRole;
-import com.example.identity.dto.request.LoginRequest;
-import com.example.identity.dto.request.LogoutRequest;
-import com.example.identity.dto.request.ProfileCreationRequest;
-import com.example.identity.dto.request.RegisterRequest;
+import com.example.identity.dto.request.*;
+import com.example.identity.dto.response.IntrospectResponse;
 import com.example.identity.dto.response.UserResponse;
 import com.example.identity.entity.InvalidatedToken;
 import com.example.identity.entity.Role;
@@ -91,5 +89,12 @@ public class AuthenticationService {
                 InvalidatedToken.builder().id(jit).expiryTime(expiryTime).build();
 
         invalidatedTokenRepository.save(invalidatedToken);
+    }
+
+    public IntrospectResponse introspect(IntrospectRequest request) throws ParseException, JOSEException {
+        var token = request.token();
+        boolean isValid = true;
+        jwtUtils.verifyToken(token);
+        return new IntrospectResponse(isValid);
     }
 }
