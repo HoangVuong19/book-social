@@ -1,4 +1,4 @@
-package com.example.profile.dto.request;
+package com.example.identity.dto.request;
 
 import java.time.LocalDate;
 

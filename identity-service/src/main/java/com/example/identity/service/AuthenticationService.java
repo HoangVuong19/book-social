@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.example.identity.constant.PredefinedRole;
 import com.example.identity.dto.request.LoginRequest;
 import com.example.identity.dto.request.LogoutRequest;
+import com.example.identity.dto.request.ProfileCreationRequest;
 import com.example.identity.dto.request.RegisterRequest;
 import com.example.identity.dto.response.UserResponse;
 import com.example.identity.entity.InvalidatedToken;
@@ -17,10 +18,12 @@ import com.example.identity.entity.Role;
 import com.example.identity.entity.User;
 import com.example.identity.exception.NotFoundException;
 import com.example.identity.exception.UnauthorizedException;
+import com.example.identity.mapper.ProfileMapper;
 import com.example.identity.mapper.UserMapper;
 import com.example.identity.repository.InvalidatedTokenRepository;
 import com.example.identity.repository.RoleRepository;
 import com.example.identity.repository.UserRepository;
+import com.example.identity.repository.httpclient.ProfileClient;
 import com.example.identity.utils.JwtUtils;
 import com.nimbusds.jose.JOSEException;
 
@@ -36,8 +39,10 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthenticationService {
     UserRepository userRepository;
     RoleRepository roleRepository;
+    ProfileClient profileClient;
     InvalidatedTokenRepository invalidatedTokenRepository;
     UserMapper userMapper;
+    ProfileMapper profileMapper;
     PasswordEncoder passwordEncoder;
     JwtUtils jwtUtils;
 
@@ -62,8 +67,18 @@ public class AuthenticationService {
         roleRepository.findById(PredefinedRole.USER_ROLE).ifPresent(roles::add);
 
         user.setRoles(roles);
+        user = userRepository.save(user);
 
-        return userMapper.toUserResponse(userRepository.save(user));
+        var profileRequest = profileMapper.toProfileCreationRequest(request);
+        profileRequest = new ProfileCreationRequest(
+                user.getId(),
+                profileRequest.firstName(),
+                profileRequest.lastName(),
+                profileRequest.dob(),
+                profileRequest.city());
+        profileClient.createProfile(profileRequest);
+
+        return userMapper.toUserResponse(user);
     }
 
     public void logout(LogoutRequest request) throws ParseException, JOSEException {
