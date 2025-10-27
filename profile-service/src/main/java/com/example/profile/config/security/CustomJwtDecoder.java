@@ -1,4 +1,4 @@
-package com.example.identity.config.security;
+package com.example.profile.config.security;
 
 import java.text.ParseException;
 

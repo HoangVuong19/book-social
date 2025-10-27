@@ -3,6 +3,7 @@ package com.example.profile.exception;
 import java.util.Objects;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +18,12 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public ApiResponse<?> handleAppException(AppException ex) {
         return ApiResponse.error(ex.getCode(), ex.getMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseBody
+    ApiResponse<?> handlingAccessDeniedException(AccessDeniedException ex) {
+        return ApiResponse.error(403, ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
