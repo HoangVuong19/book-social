@@ -1,15 +1,7 @@
 package com.example.gateway.config;
 
-import com.example.gateway.config.serialize.ApiResponse;
-import com.example.gateway.dto.request.IntrospectRequest;
-import com.example.gateway.dto.response.IntrospectResponse;
-import com.example.gateway.service.IdentityService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -20,9 +12,19 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
 
-import java.util.List;
+import com.example.gateway.config.serialize.ApiResponse;
+import com.example.gateway.dto.request.IntrospectRequest;
+import com.example.gateway.dto.response.IntrospectResponse;
+import com.example.gateway.service.IdentityService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
 @Component
 @Slf4j
@@ -80,7 +82,6 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     }
 
     private boolean isPublicEndpoint(String path) {
-        return customGatewayProperties.getPublicPaths().stream()
-                .anyMatch(path::contains);
+        return customGatewayProperties.getPublicPaths().stream().anyMatch(path::contains);
     }
 }
