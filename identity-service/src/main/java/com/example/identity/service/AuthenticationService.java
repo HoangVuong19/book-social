@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.HashSet;
 
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +44,7 @@ public class AuthenticationService {
     ProfileMapper profileMapper;
     PasswordEncoder passwordEncoder;
     JwtUtils jwtUtils;
+    KafkaTemplate<String, String> kafkaTemplate;
 
     public String login(LoginRequest request) {
         var user = userRepository
@@ -76,6 +78,8 @@ public class AuthenticationService {
                 profileRequest.city());
         profileClient.createProfile(profileRequest);
 
+        // Publish message to kafka
+        kafkaTemplate.send("onboard-successful", "Welcome our new member " + user.getUsername());
         return userMapper.toUserResponse(user);
     }
 
