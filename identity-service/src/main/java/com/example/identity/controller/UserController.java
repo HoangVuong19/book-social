@@ -27,8 +27,8 @@ public class UserController {
 
     @GetMapping("/me")
     ApiResponse<UserResponse> getMe() {
-        String username = userContext.getCurrentUsername();
-        return ApiResponse.success(userService.getUserByUsername(username));
+        String userId = userContext.getCurrentUsername();
+        return ApiResponse.success(userService.getUserByUserId(userId));
     }
 
     @GetMapping

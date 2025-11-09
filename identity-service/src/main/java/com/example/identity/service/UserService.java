@@ -51,8 +51,8 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    public UserResponse getUserByUsername(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
+    public UserResponse getUserByUserId(String userId) {
+        Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             throw new NotFoundException("User not found");
         }
