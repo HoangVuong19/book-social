@@ -2,12 +2,13 @@ package com.example.identity.dto.request;
 
 import java.time.LocalDate;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 
 import com.example.identity.validator.DobConstraint;
 
 public record RegisterRequest(
-        @Size(min = 3, message = "Username must be at least 3 characters") String username,
+        @Email(message = "Username must be email format") String username,
         @Size(min = 8, message = "Password must be at least 8 characters") String password,
         String firstName,
         String lastName,

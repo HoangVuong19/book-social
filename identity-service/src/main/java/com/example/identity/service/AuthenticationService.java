@@ -8,6 +8,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.event.NotificationEvent;
 import com.example.identity.constant.PredefinedRole;
 import com.example.identity.dto.request.*;
 import com.example.identity.dto.response.IntrospectResponse;
@@ -44,7 +45,7 @@ public class AuthenticationService {
     ProfileMapper profileMapper;
     PasswordEncoder passwordEncoder;
     JwtUtils jwtUtils;
-    KafkaTemplate<String, String> kafkaTemplate;
+    KafkaTemplate<String, Object> kafkaTemplate;
 
     public String login(LoginRequest request) {
         var user = userRepository
@@ -78,8 +79,11 @@ public class AuthenticationService {
                 profileRequest.city());
         profileClient.createProfile(profileRequest);
 
+        NotificationEvent notificationEvent = new NotificationEvent(
+                "EMAIL", request.username(), "Welcome to book-social", "Hello, " + request.username());
         // Publish message to kafka
-        kafkaTemplate.send("onboard-successful", "Welcome our new member " + user.getUsername());
+        kafkaTemplate.send("notification-delivery", notificationEvent);
+
         return userMapper.toUserResponse(user);
     }
 
