@@ -1,9 +1,8 @@
 package com.example.profile.controller;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import com.example.profile.config.serialize.ApiResponse;
 import com.example.profile.dto.request.ProfileCreationRequest;
 import com.example.profile.dto.response.UserProfileResponse;
 import com.example.profile.service.UserProfileService;
@@ -21,5 +20,10 @@ public class InternalUserProfileController {
     @PostMapping("/internal/users")
     UserProfileResponse createProfile(@RequestBody ProfileCreationRequest request) {
         return userProfileService.createProfile(request);
+    }
+
+    @GetMapping("/internal/users/{userId}")
+    ApiResponse<UserProfileResponse> getProfile(@PathVariable String userId) {
+        return ApiResponse.success(userProfileService.getByUserId(userId));
     }
 }

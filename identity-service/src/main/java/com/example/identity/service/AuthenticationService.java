@@ -73,6 +73,7 @@ public class AuthenticationService {
         var profileRequest = profileMapper.toProfileCreationRequest(request);
         profileRequest = new ProfileCreationRequest(
                 user.getId(),
+                profileRequest.username(),
                 profileRequest.firstName(),
                 profileRequest.lastName(),
                 profileRequest.dob(),

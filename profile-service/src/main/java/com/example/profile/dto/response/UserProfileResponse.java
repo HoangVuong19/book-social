@@ -2,4 +2,5 @@ package com.example.profile.dto.response;
 
 import java.time.LocalDate;
 
-public record UserProfileResponse(String id, String firstName, String lastName, LocalDate dob, String city) {}
+public record UserProfileResponse(
+        String id, String username, String firstName, String lastName, LocalDate dob, String city) {}

@@ -45,4 +45,11 @@ public class UserProfileService {
 
         return profiles.stream().map(userProfileMapper::toUserProfileResponse).toList();
     }
+
+    public UserProfileResponse getByUserId(String userId) {
+        UserProfile userProfile =
+                userProfileRepository.findByUserId(userId).orElseThrow(() -> new NotFoundException("User not existed"));
+
+        return userProfileMapper.toUserProfileResponse(userProfile);
+    }
 }
