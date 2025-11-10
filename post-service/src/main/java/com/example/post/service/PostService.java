@@ -13,6 +13,7 @@ import com.example.post.dto.response.PostResponse;
 import com.example.post.entity.Post;
 import com.example.post.mapper.PostMapper;
 import com.example.post.repository.PostRepository;
+import com.example.post.utils.DateTimeFormatter;
 import com.example.post.utils.UserContext;
 
 import lombok.AccessLevel;
@@ -26,6 +27,7 @@ public class PostService {
     PostRepository postRepository;
     PostMapper postMapper;
     UserContext userContext;
+    DateTimeFormatter dateTimeFormatter;
 
     public PostResponse createPost(PostRequest request) {
         String userId = userContext.getCurrentUsername();
@@ -48,14 +50,25 @@ public class PostService {
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         var pageData = postRepository.findAllByUserId(userId, pageable);
 
+        var postList = pageData.getContent().stream()
+                .map(post -> {
+                    String formattedCreated = dateTimeFormatter.format(post.getCreatedDate());
+                    return new PostResponse(
+                            post.getId(),
+                            post.getContent(),
+                            post.getUserId(),
+                            formattedCreated,
+                            post.getCreatedDate(),
+                            post.getModifiedDate());
+                })
+                .toList();
+
         return PageResponse.<PostResponse>builder()
                 .currentPage(page)
                 .pageSize(pageData.getSize())
                 .totalPages(pageData.getTotalPages())
                 .totalElements(pageData.getTotalElements())
-                .data(pageData.getContent().stream()
-                        .map(postMapper::toPostResponse)
-                        .toList())
+                .data(postList)
                 .build();
     }
 }
