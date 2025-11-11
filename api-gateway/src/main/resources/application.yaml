@@ -10,6 +10,7 @@ gateway:
     - /api/identity/auth/register
     - /api/identity/auth/introspect
     - /api/notification/email/send
+    - /api/file/media/download
 
 spring:
   application:

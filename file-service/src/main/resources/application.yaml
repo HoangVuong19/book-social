@@ -12,4 +12,4 @@ spring:
 app:
   file:
     storage-dir: /Users/hoangvuong/Projects/Java/book-social/file-service/src/main/resources/uploads
-    download-prefix: http://localhost:8888/api/file/media/
+    download-prefix: http://localhost:8888/api/file/media/download/
