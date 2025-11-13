@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.profile.dto.request.ProfileCreationRequest;
+import com.example.profile.dto.request.SearchUserRequest;
 import com.example.profile.dto.request.UpdateProfileRequest;
 import com.example.profile.dto.response.UserProfileResponse;
 import com.example.profile.entity.UserProfile;
@@ -90,5 +91,14 @@ public class UserProfileService {
         profile.setAvatar(response.getData().getUrl());
 
         return userProfileMapper.toUserProfileResponse(userProfileRepository.save(profile));
+    }
+
+    public List<UserProfileResponse> search(SearchUserRequest request) {
+        var userId = userContext.getCurrentUsername();
+        List<UserProfile> userProfiles = userProfileRepository.findAllByUsernameLike(request.keyword());
+        return userProfiles.stream()
+                .filter(userProfile -> !userId.equals(userProfile.getUserId()))
+                .map(userProfileMapper::toUserProfileResponse)
+                .toList();
     }
 }

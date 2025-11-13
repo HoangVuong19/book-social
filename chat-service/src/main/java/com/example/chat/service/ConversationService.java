@@ -1,6 +1,9 @@
 package com.example.chat.service;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringJoiner;
 
 import org.springframework.stereotype.Service;
@@ -8,6 +11,8 @@ import org.springframework.stereotype.Service;
 import com.example.chat.dto.request.ConversationRequest;
 import com.example.chat.dto.response.ConversationResponse;
 import com.example.chat.entity.Conversation;
+import com.example.chat.entity.ParticipantInfo;
+import com.example.chat.exception.UncategorizedException;
 import com.example.chat.mapper.ConversationMapper;
 import com.example.chat.repository.ConversationRepository;
 import com.example.chat.repository.httpclient.ProfileClient;
@@ -30,11 +35,61 @@ public class ConversationService {
     UserContext userContext;
 
     public List<ConversationResponse> myConversations() {
-        return null;
+        String userId = userContext.getCurrentUsername();
+        List<Conversation> conversations = conversationRepository.findAllByParticipantIdsContains(userId);
+
+        return conversations.stream().map(this::toConversationResponse).toList();
     }
 
     public ConversationResponse create(ConversationRequest request) {
-        return null;
+        // Fetch user infos
+        String userId = userContext.getCurrentUsername();
+        var userInfoResponse = profileClient.getProfile(userId);
+        var participantInfoResponse =
+                profileClient.getProfile(request.participantIds().get(0));
+
+        if (Objects.isNull(userInfoResponse) || Objects.isNull(participantInfoResponse)) {
+            throw new UncategorizedException("Uncategorized error");
+        }
+
+        var userInfo = userInfoResponse.getData();
+        var participantInfo = participantInfoResponse.getData();
+
+        List<String> userIds = new ArrayList<>();
+        userIds.add(userId);
+        userIds.add(participantInfo.userId());
+
+        var sortedIds = userIds.stream().sorted().toList();
+        String userIdHash = generateParticipantHash(sortedIds);
+
+        List<ParticipantInfo> participantInfos = List.of(
+                ParticipantInfo.builder()
+                        .userId(userInfo.userId())
+                        .username(userInfo.username())
+                        .firstName(userInfo.firstName())
+                        .lastName(userInfo.lastName())
+                        .avatar(userInfo.avatar())
+                        .build(),
+                ParticipantInfo.builder()
+                        .userId(participantInfo.userId())
+                        .username(participantInfo.username())
+                        .firstName(participantInfo.firstName())
+                        .lastName(participantInfo.lastName())
+                        .avatar(participantInfo.avatar())
+                        .build());
+
+        // Build conversation info
+        Conversation conversation = Conversation.builder()
+                .type(request.type())
+                .participantsHash(userIdHash)
+                .createdDate(Instant.now())
+                .modifiedDate(Instant.now())
+                .participants(participantInfos)
+                .build();
+
+        conversation = conversationRepository.save(conversation);
+
+        return toConversationResponse(conversation);
     }
 
     private String generateParticipantHash(List<String> ids) {

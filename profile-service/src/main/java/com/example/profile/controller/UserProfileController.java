@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.profile.config.serialize.ApiResponse;
+import com.example.profile.dto.request.SearchUserRequest;
 import com.example.profile.dto.request.UpdateProfileRequest;
 import com.example.profile.dto.response.UserProfileResponse;
 import com.example.profile.service.UserProfileService;
@@ -43,5 +44,10 @@ public class UserProfileController {
     @PutMapping("/users/avatar")
     ApiResponse<UserProfileResponse> updateAvatar(@RequestParam("file") MultipartFile file) {
         return ApiResponse.success(userProfileService.updateAvatar(file));
+    }
+
+    @PostMapping("/users/search")
+    ApiResponse<List<UserProfileResponse>> search(@RequestBody SearchUserRequest request) {
+        return ApiResponse.success(userProfileService.search(request));
     }
 }
