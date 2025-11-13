@@ -22,6 +22,7 @@ public class UserProfile {
     String id;
 
     String userId;
+    String avatar;
     String username;
     String firstName;
     String lastName;

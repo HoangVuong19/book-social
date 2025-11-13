@@ -2,11 +2,11 @@ package com.example.profile.controller;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.profile.config.serialize.ApiResponse;
+import com.example.profile.dto.request.UpdateProfileRequest;
 import com.example.profile.dto.response.UserProfileResponse;
 import com.example.profile.service.UserProfileService;
 
@@ -28,5 +28,20 @@ public class UserProfileController {
     @GetMapping("/users")
     ApiResponse<List<UserProfileResponse>> getAllProfiles() {
         return ApiResponse.success(userProfileService.getAllProfiles());
+    }
+
+    @GetMapping("/users/my-profile")
+    ApiResponse<UserProfileResponse> getMyProfile() {
+        return ApiResponse.success(userProfileService.getMyProfile());
+    }
+
+    @PutMapping("/users/my-profile")
+    ApiResponse<UserProfileResponse> updateMyProfile(@RequestBody UpdateProfileRequest request) {
+        return ApiResponse.success(userProfileService.updateMyProfile(request));
+    }
+
+    @PutMapping("/users/avatar")
+    ApiResponse<UserProfileResponse> updateAvatar(@RequestParam("file") MultipartFile file) {
+        return ApiResponse.success(userProfileService.updateAvatar(file));
     }
 }
