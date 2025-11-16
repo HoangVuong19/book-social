@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 
+import com.corundumstudio.socketio.SocketIOServer;
 import com.example.chat.dto.request.ChatMessageRequest;
 import com.example.chat.dto.response.ChatMessageResponse;
 import com.example.chat.entity.ChatMessage;
@@ -28,6 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ChatMessageService {
+    SocketIOServer socketIOServer;
+
     ChatMessageRepository chatMessageRepository;
     ConversationRepository conversationRepository;
     ProfileClient profileClient;
@@ -84,6 +87,12 @@ public class ChatMessageService {
 
         // Create chat message
         chatMessage = chatMessageRepository.save(chatMessage);
+        String message = chatMessage.getMessage();
+
+        // Publish socket event to clients
+        socketIOServer.getAllClients().forEach(client -> {
+            client.sendEvent("message", message);
+        });
 
         // convert to Response
         return toChatMessageResponse(chatMessage);
