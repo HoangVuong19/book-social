@@ -62,32 +62,36 @@ public class ConversationService {
         var sortedIds = userIds.stream().sorted().toList();
         String userIdHash = generateParticipantHash(sortedIds);
 
-        List<ParticipantInfo> participantInfos = List.of(
-                ParticipantInfo.builder()
-                        .userId(userInfo.userId())
-                        .username(userInfo.username())
-                        .firstName(userInfo.firstName())
-                        .lastName(userInfo.lastName())
-                        .avatar(userInfo.avatar())
-                        .build(),
-                ParticipantInfo.builder()
-                        .userId(participantInfo.userId())
-                        .username(participantInfo.username())
-                        .firstName(participantInfo.firstName())
-                        .lastName(participantInfo.lastName())
-                        .avatar(participantInfo.avatar())
-                        .build());
+        var conversation = conversationRepository
+                .findByParticipantsHash(userIdHash)
+                .orElseGet(() -> {
+                    List<ParticipantInfo> participantInfos = List.of(
+                            ParticipantInfo.builder()
+                                    .userId(userInfo.userId())
+                                    .username(userInfo.username())
+                                    .firstName(userInfo.firstName())
+                                    .lastName(userInfo.lastName())
+                                    .avatar(userInfo.avatar())
+                                    .build(),
+                            ParticipantInfo.builder()
+                                    .userId(participantInfo.userId())
+                                    .username(participantInfo.username())
+                                    .firstName(participantInfo.firstName())
+                                    .lastName(participantInfo.lastName())
+                                    .avatar(participantInfo.avatar())
+                                    .build());
 
-        // Build conversation info
-        Conversation conversation = Conversation.builder()
-                .type(request.type())
-                .participantsHash(userIdHash)
-                .createdDate(Instant.now())
-                .modifiedDate(Instant.now())
-                .participants(participantInfos)
-                .build();
+                    // Build conversation info
+                    Conversation newConversation = Conversation.builder()
+                            .type(request.type())
+                            .participantsHash(userIdHash)
+                            .createdDate(Instant.now())
+                            .modifiedDate(Instant.now())
+                            .participants(participantInfos)
+                            .build();
 
-        conversation = conversationRepository.save(conversation);
+                    return conversationRepository.save(newConversation);
+                });
 
         return toConversationResponse(conversation);
     }
