@@ -1,13 +1,5 @@
 package com.example.identity.service;
 
-import java.text.ParseException;
-import java.util.Date;
-import java.util.HashSet;
-
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import com.example.event.NotificationEvent;
 import com.example.identity.constant.PredefinedRole;
 import com.example.identity.dto.request.*;
@@ -26,11 +18,17 @@ import com.example.identity.repository.UserRepository;
 import com.example.identity.repository.httpclient.ProfileClient;
 import com.example.identity.utils.JwtUtils;
 import com.nimbusds.jose.JOSEException;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.text.ParseException;
+import java.util.Date;
+import java.util.HashSet;
 
 @Service
 @RequiredArgsConstructor
@@ -103,7 +101,7 @@ public class AuthenticationService {
     public IntrospectResponse introspect(IntrospectRequest request) throws ParseException, JOSEException {
         var token = request.token();
         boolean isValid = true;
-        jwtUtils.verifyToken(token);
-        return new IntrospectResponse(isValid);
+        var jwt = jwtUtils.verifyToken(token);
+        return new IntrospectResponse(isValid, jwt.getJWTClaimsSet().getSubject());
     }
 }
